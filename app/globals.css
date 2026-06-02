@@ -1,0 +1,195 @@
+/* Essential CSS Variables for Custom Components */
+:root {
+  --sidebar-width: 280px;
+  --navbar-height: 70px;
+}
+
+/* Basic Reset - Only what Bootstrap doesn't handle */
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Custom sidebar styles - Only for admin layout */
+.sidebar {
+  width: 260px;
+  height: 100vh;
+  background: #1e3a5f;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1050;
+  transition: transform 0.25s ease;
+  transform: translateX(-100%);
+  overflow: hidden;
+}
+
+.sidebar.show {
+  transform: translateX(0);
+}
+
+@media (min-width: 768px) {
+  .sidebar {
+    transform: translateX(0);
+  }
+}
+
+/* Custom admin content layout */
+@media (min-width: 768px) {
+  main {
+    margin-left: 260px !important;
+  }
+}
+
+/* Custom animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Responsive Design - Only for admin layout */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  
+  .sidebar.show {
+    transform: translateX(0);
+  }
+  
+  .admin-content {
+    margin-left: 0;
+    padding: 1rem;
+  }
+  
+  .admin-main {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .admin-main {
+    padding: 0.5rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .table-responsive {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+    border: 1px solid rgba(13, 110, 253, 0.12);
+    border-radius: 0.85rem;
+    background-color: #fff;
+  }
+
+  .table-responsive > .table {
+    min-width: 720px;
+    margin-bottom: 0;
+  }
+
+  .table-responsive > .table th,
+  .table-responsive > .table td {
+    padding: 0.7rem 0.85rem;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+
+  .table-responsive > .table thead th:last-child {
+    position: sticky;
+    right: 0;
+    z-index: 3;
+    background: #f8f9fa;
+    box-shadow: -10px 0 14px -14px rgba(15, 23, 42, 0.55);
+  }
+
+  .table-responsive > .table tbody td:last-child {
+    position: sticky;
+    right: 0;
+    z-index: 2;
+    background: #fff;
+    box-shadow: -10px 0 14px -14px rgba(15, 23, 42, 0.55);
+  }
+
+  .table-responsive > .table tbody tr:hover td:last-child {
+    background: #f8fbff;
+  }
+
+  .table-responsive > .table .btn-group,
+  .table-responsive > .table .btn-group-sm {
+    flex-wrap: nowrap;
+  }
+
+  .table-responsive > .table .btn-group > .btn,
+  .table-responsive > .table .btn-group-sm > .btn {
+    white-space: nowrap;
+  }
+
+  .table-responsive > .table .badge {
+    white-space: nowrap;
+  }
+
+  .mobile-action-column {
+    display: none;
+  }
+
+  .mobile-inline-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+
+  .mobile-inline-actions .btn,
+  .mobile-inline-actions a.btn {
+    min-height: 36px;
+    min-width: auto;
+  }
+}
