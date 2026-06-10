@@ -5,10 +5,11 @@ import Image from 'next/image';
 import { useSettings } from '@/hooks/useRedux';
 import { usePermissions } from '@/hooks/usePermissions';
 import { getImageUrl } from '@/utils/imageUtils';
+import { SCHOOL_CONTACT } from '@/config/schoolContact';
 import s from '@/styles/admin-portal.module.css';
 
 const DEFAULTS = {
-  school_name: '', school_logo: '', school_favicon: '', school_address: '', school_phone: '',
+  school_name: '', school_logo: '', school_favicon: '', school_address: SCHOOL_CONTACT.address, school_phone: SCHOOL_CONTACT.phone,
   school_email: '', school_website: '', school_motto: '', school_mission: '', school_vision: '',
   academic_year: '', application_fee: 0, currency: 'NGN', timezone: 'Africa/Lagos',
   date_format: 'YYYY-MM-DD', time_format: '24h', language: 'en', theme_color: '#1e3a5f',

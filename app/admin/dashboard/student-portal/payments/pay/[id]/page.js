@@ -1,21 +1,32 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import Script from 'next/script';
+import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useApplications } from '@/hooks/useRedux';
 import { API_ENDPOINTS, apiService } from '@/services/api';
 import s from '@/styles/student-portal.module.css';
 
+const VERIFY_ATTEMPTS = 24;
+const VERIFY_INTERVAL_MS = 2500;
+const getStoredReferenceKey = (applicationId) => `pending-payment-reference:${applicationId}`;
+
 export default function PayApplicationFeePage() {
   const params = useParams();
+  const router = useRouter();
   const { status } = useSession();
-  const { applications } = useApplications();
+  const { applications, fetchMyApplications } = useApplications();
+  const verifyTimerRef = useRef(null);
 
   const [application, setApplication] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [checkoutReady, setCheckoutReady] = useState(false);
   const [paying, setPaying] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+  const [paymentReference, setPaymentReference] = useState('');
+  const [paymentComplete, setPaymentComplete] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
@@ -38,40 +49,108 @@ export default function PayApplicationFeePage() {
     if (status === 'authenticated' && params.id) fetchApplication();
   }, [status, params.id, fetchApplication]);
 
+  useEffect(() => () => {
+    if (verifyTimerRef.current) clearTimeout(verifyTimerRef.current);
+  }, []);
+
+  const verifyPayment = useCallback(async (reference, attemptsRemaining = VERIFY_ATTEMPTS) => {
+    if (!reference || paymentComplete) return;
+
+    setVerifying(true);
+    try {
+      const response = await apiService.get(API_ENDPOINTS.PAYMENTS.VERIFY(reference));
+      const result = response?.data || response;
+
+      if (result?.payment_status === 'success' || result?.transaction?.payment_status === 'success') {
+        if (verifyTimerRef.current) clearTimeout(verifyTimerRef.current);
+        localStorage.removeItem(getStoredReferenceKey(params.id));
+        setPaymentComplete(true);
+        setApplication((current) => current ? { ...current, payment_status: 'paid', payment_reference: reference } : current);
+        setPaying(false);
+        setVerifying(false);
+        setSuccess('Payment confirmed. Your application has been updated.');
+        await fetchMyApplications();
+        return;
+      }
+
+      if (attemptsRemaining > 1) {
+        verifyTimerRef.current = setTimeout(
+          () => verifyPayment(reference, attemptsRemaining - 1),
+          VERIFY_INTERVAL_MS
+        );
+        return;
+      }
+
+      setSuccess('Payment is still being confirmed. Use “Check payment status” below in a moment.');
+    } catch (err) {
+      if (attemptsRemaining > 1) {
+        verifyTimerRef.current = setTimeout(
+          () => verifyPayment(reference, attemptsRemaining - 1),
+          VERIFY_INTERVAL_MS
+        );
+        return;
+      }
+      setError(err?.message || err?.data?.message || 'We could not confirm the payment yet. Please check again.');
+    } finally {
+      if (attemptsRemaining <= 1) {
+        setVerifying(false);
+        setPaying(false);
+      }
+    }
+  }, [fetchMyApplications, params.id, paymentComplete]);
+
+  useEffect(() => {
+    if (status !== 'authenticated' || !params.id || paymentComplete) return;
+    const storedReference = localStorage.getItem(getStoredReferenceKey(params.id));
+    if (storedReference) {
+      setPaymentReference(storedReference);
+      setSuccess('Checking the status of your previous payment attempt...');
+      verifyPayment(storedReference);
+    }
+  }, [params.id, paymentComplete, status, verifyPayment]);
+
   const handlePayNow = async () => {
     setPaying(true);
     setError('');
+    setSuccess('');
     try {
+      if (!checkoutReady || !window.PaystackPop) {
+        setError('Secure checkout is still loading. Please try again in a moment.');
+        setPaying(false);
+        return;
+      }
       if (!application?.application_fee || application.application_fee <= 0) {
-        setError('Application fee is not available or invalid'); return;
+        setError('Application fee is not available or invalid');
+        setPaying(false);
+        return;
       }
-      const applicantEmail = application?.applicant_email || application?.email;
-      if (!applicantEmail) { setError('Application email is not available'); return; }
-
-      const paymentData = {
+      const response = await apiService.post(API_ENDPOINTS.PAYMENTS.INITIALIZE, {
         applicant_id: params.id,
-        amount: application.application_fee,
-        email: applicantEmail,
-        reference: `APP${params.id}_${Date.now()}`,
-        paystack_subaccount: application?.paystack_subaccount || application?.school_paystack_subaccount || application?.school?.paystack_subaccount || null,
-        paystack_split_code: application?.paystack_split_code || application?.school_paystack_split_code || application?.school?.paystack_split_code || null,
-      };
+      });
+      const payment = response?.data || response;
 
-      const response = await apiService.post(API_ENDPOINTS.PAYMENTS.INITIALIZE, paymentData);
-      const authorizationUrl = response?.data?.authorization_url;
-
-      if (authorizationUrl) {
-        window.open(authorizationUrl, '_blank');
-        setSuccess('Payment page opened in a new tab. Complete your payment and return here to verify.');
-        setTimeout(() => setSuccess(''), 12000);
-      } else {
+      if (!payment?.access_code || !payment?.reference) {
         setError('Failed to initialize payment. Please try again.');
+        setPaying(false);
+        return;
       }
+
+      setPaymentReference(payment.reference);
+      localStorage.setItem(getStoredReferenceKey(params.id), payment.reference);
+      setSuccess('Secure checkout opened. This page will confirm your payment automatically.');
+      const popup = new window.PaystackPop();
+      popup.resumeTransaction(payment.access_code);
+      verifyPayment(payment.reference);
     } catch (err) {
       setError(err?.message || err?.data?.message || 'Failed to initialize payment');
-    } finally {
       setPaying(false);
     }
+  };
+
+  const handleCheckStatus = () => {
+    setError('');
+    setSuccess('Checking your payment with Paystack...');
+    verifyPayment(paymentReference);
   };
 
   if (loading) {
@@ -85,7 +164,7 @@ export default function PayApplicationFeePage() {
           <div className={s.emptyState}>
             <div className={s.emptyIcon}><i className="fas fa-exclamation-triangle" style={{ color: '#d97706' }} /></div>
             <h5 className={s.emptyTitle}>Application Not Found</h5>
-            <p className={s.emptySub}>We couldn't load this application's details.</p>
+            <p className={s.emptySub}>We could not load this application&apos;s details.</p>
             <Link href="/admin/dashboard/student-portal/applications" className={s.btnPrimary}><i className="fas fa-arrow-left" />Back to Applications</Link>
           </div>
         </div>
@@ -95,6 +174,13 @@ export default function PayApplicationFeePage() {
 
   return (
     <div className={s.wrap}>
+      <Script
+        src="https://js.paystack.co/v2/inline.js"
+        strategy="afterInteractive"
+        onLoad={() => setCheckoutReady(true)}
+        onReady={() => setCheckoutReady(true)}
+        onError={() => setError('Secure checkout could not load. Check your connection and refresh the page.')}
+      />
       {/* Header */}
       <div className={s.pageHeader}>
         <div>
@@ -118,7 +204,7 @@ export default function PayApplicationFeePage() {
           )}
           {success && (
             <div className={`${s.alertSuccess} mb-4`}>
-              <div style={{ fontWeight: 600, marginBottom: '0.3rem' }}><i className="fas fa-check-circle me-2" />Payment Page Opened</div>
+              <div style={{ fontWeight: 600, marginBottom: '0.3rem' }}><i className="fas fa-check-circle me-2" />Payment Update</div>
               <div style={{ fontSize: '0.875rem' }}>{success}</div>
             </div>
           )}
@@ -186,15 +272,41 @@ export default function PayApplicationFeePage() {
               {/* CTA */}
               <button
                 onClick={handlePayNow}
-                disabled={paying}
+                disabled={paying || verifying || paymentComplete || application.payment_status === 'paid' || !checkoutReady}
                 className={s.btnGreen}
                 style={{ width: '100%', justifyContent: 'center', padding: '0.85rem', fontSize: '1rem', borderRadius: '10px' }}
               >
-                {paying
-                  ? <><span className="spinner-border spinner-border-sm" />Opening Payment Page…</>
+                {paymentComplete || application.payment_status === 'paid'
+                  ? <><i className="fas fa-check-circle" />Payment Confirmed</>
+                  : paying || verifying
+                  ? <><span className="spinner-border spinner-border-sm" />Confirming Payment…</>
+                  : !checkoutReady
+                  ? <><span className="spinner-border spinner-border-sm" />Loading Secure Checkout…</>
                   : <><i className="fas fa-lock" />Pay ₦{parseFloat(application.application_fee || 0).toLocaleString()} Now</>
                 }
               </button>
+
+              {paymentReference && !paymentComplete && (
+                <button
+                  onClick={handleCheckStatus}
+                  disabled={verifying}
+                  className={s.btnOutline}
+                  style={{ width: '100%', justifyContent: 'center', marginTop: '0.75rem' }}
+                >
+                  <i className="fas fa-sync-alt" />
+                  {verifying ? 'Checking Payment…' : 'Check Payment Status'}
+                </button>
+              )}
+
+              {(paymentComplete || application.payment_status === 'paid') && (
+                <button
+                  onClick={() => router.push('/admin/dashboard/student-portal/applications?payment_success=true')}
+                  className={s.btnPrimary}
+                  style={{ width: '100%', justifyContent: 'center', marginTop: '0.75rem' }}
+                >
+                  <i className="fas fa-arrow-right" />Continue to Applications
+                </button>
+              )}
 
               <div style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.8rem', color: '#9ca3af' }}>
                 <i className="fas fa-question-circle me-1" />
@@ -209,10 +321,10 @@ export default function PayApplicationFeePage() {
             <div className={s.cardBody}>
               <ol style={{ paddingLeft: '1.25rem', margin: 0, fontSize: '0.875rem', color: '#374151', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                 <li>Click the <strong>Pay Now</strong> button above</li>
-                <li>A Paystack payment page will open in a new tab</li>
+                <li>Secure Paystack checkout opens over this page</li>
                 <li>Choose your payment method (Card, Bank Transfer, or USSD)</li>
-                <li>Complete the payment on the Paystack page</li>
-                <li>Return to this tab — your application status will update automatically</li>
+                <li>Complete the payment without leaving the portal</li>
+                <li>This page verifies the payment and updates your application automatically</li>
                 <li>A payment confirmation will be sent to your email</li>
               </ol>
             </div>

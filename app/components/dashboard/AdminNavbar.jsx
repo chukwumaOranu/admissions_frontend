@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import { useSettings } from '@/hooks/useRedux';
+import { SCHOOL_CONTACT } from '@/config/schoolContact';
 
 const BREADCRUMB_MAP = {
   '/admin/dashboard': 'Dashboard',
@@ -32,6 +33,7 @@ export default function AdminNavbar({ onToggleSidebar }) {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [showContactDetails, setShowContactDetails] = useState(false);
   const pathname = usePathname();
   const { data: session, status } = useSession();
   const { schoolSettings, fetchSchoolSettings } = useSettings();
@@ -39,10 +41,13 @@ export default function AdminNavbar({ onToggleSidebar }) {
   const pageTitle = getPageTitle(pathname);
 
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    const checkViewport = () => {
+      setIsMobile(window.innerWidth < 768);
+      setShowContactDetails(window.innerWidth >= 1280);
+    };
+    checkViewport();
+    window.addEventListener('resize', checkViewport);
+    return () => window.removeEventListener('resize', checkViewport);
   }, []);
 
   useEffect(() => {
@@ -107,6 +112,21 @@ export default function AdminNavbar({ onToggleSidebar }) {
 
       {/* Right actions */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', flexShrink: 0 }}>
+        {showContactDetails && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginRight: '0.75rem', color: '#64748b' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.72rem', maxWidth: 290 }}>
+              <i className="fas fa-map-marker-alt" aria-hidden="true" />
+              <span>{SCHOOL_CONTACT.address}</span>
+            </span>
+            <a
+              href={SCHOOL_CONTACT.phoneHref}
+              style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#64748b', fontSize: '0.72rem', textDecoration: 'none', whiteSpace: 'nowrap' }}
+            >
+              <i className="fas fa-phone" aria-hidden="true" />
+              <span>{SCHOOL_CONTACT.phone}</span>
+            </a>
+          </div>
+        )}
 
         {/* Notifications */}
         <div className="nb-dropdown" style={{ position: 'relative' }}>

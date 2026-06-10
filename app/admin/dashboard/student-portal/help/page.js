@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useSettings } from '@/hooks/useRedux';
 import s from '@/styles/student-portal.module.css';
+import { SCHOOL_CONTACT } from '@/config/schoolContact';
 
 const QUICK_LINKS = [
   { icon: 'fas fa-question-circle', label: 'Frequently Asked Questions',  color: '#2563eb' },
@@ -18,8 +19,8 @@ export default function StudentHelp() {
 
   const contacts = [
     schoolSettings?.school_email    && { icon: 'fas fa-envelope',       color: '#2563eb', label: 'Email',   value: schoolSettings.school_email,   href: `mailto:${schoolSettings.school_email}` },
-    schoolSettings?.school_phone    && { icon: 'fas fa-phone',          color: '#059669', label: 'Phone',   value: schoolSettings.school_phone,   href: `tel:${schoolSettings.school_phone}` },
-    schoolSettings?.school_address  && { icon: 'fas fa-map-marker-alt', color: '#dc2626', label: 'Address', value: schoolSettings.school_address,  href: null },
+    { icon: 'fas fa-phone',          color: '#059669', label: 'Phone',   value: SCHOOL_CONTACT.phone,   href: SCHOOL_CONTACT.phoneHref },
+    { icon: 'fas fa-map-marker-alt', color: '#dc2626', label: 'Address', value: SCHOOL_CONTACT.address, href: null },
     schoolSettings?.school_website  && { icon: 'fas fa-globe',          color: '#0891b2', label: 'Website', value: schoolSettings.school_website, href: schoolSettings.school_website, external: true },
   ].filter(Boolean);
 
@@ -107,9 +108,7 @@ export default function StudentHelp() {
           {schoolSettings?.school_email && (
             <a href={`mailto:${schoolSettings.school_email}`} className={s.btnPrimary}><i className="fas fa-envelope" />Send Email</a>
           )}
-          {schoolSettings?.school_phone && (
-            <a href={`tel:${schoolSettings.school_phone}`} className={s.btnOutline}><i className="fas fa-phone" />Call Us</a>
-          )}
+          <a href={SCHOOL_CONTACT.phoneHref} className={s.btnOutline}><i className="fas fa-phone" />Call Us</a>
         </div>
       </div>
     </div>
