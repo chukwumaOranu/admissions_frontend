@@ -6,11 +6,11 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useApplications } from '@/hooks/useRedux';
-import { API_ENDPOINTS, API_URL, apiService } from '@/services/api';
+import { API_ENDPOINTS, apiService } from '@/services/api';
+import { getProfilePhotoUrl } from '@/utils/imageUtils';
 import s from '@/styles/student-portal.module.css';
 
 const inp = { width: '100%', padding: '0.5rem 0.75rem', border: '1px solid #d1d5db', borderRadius: 8, fontSize: '0.875rem', color: '#374151', background: '#fff', outline: 'none', boxSizing: 'border-box' };
-const IMAGE_URL = API_URL.replace(/\/api\/?$/, '');
 
 export default function NewApplicationPage() {
   const router = useRouter();
@@ -324,7 +324,7 @@ export default function NewApplicationPage() {
   const docFields = fields.filter(f => f.field_type === 'file');
   const profilePhotoUrl = profilePhotoPreview || (
     studentProfile?.profile_photo
-      ? `${IMAGE_URL}${studentProfile.profile_photo}`
+      ? getProfilePhotoUrl(studentProfile.profile_photo)
       : null
   );
 

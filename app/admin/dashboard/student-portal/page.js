@@ -6,9 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { API_ENDPOINTS, apiService } from '@/services/api';
-
-const API_URL   = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-const IMAGE_URL = API_URL.replace('/api', '') || 'http://localhost:5000';
+import { getProfilePhotoUrl } from '@/utils/imageUtils';
 
 const STAT_CONFIG = [
   { key: 'applications', label: 'Applications', sub: 'Total submitted', icon: 'fas fa-file-alt',        color: '#2563eb', href: '/admin/dashboard/student-portal/applications' },
@@ -59,7 +57,7 @@ export default function StudentPortalDashboard() {
 
   const profilePhotoUrl = useMemo(() => {
     if (!studentData?.profile_photo) return null;
-    return `${IMAGE_URL}${studentData.profile_photo}`;
+    return getProfilePhotoUrl(studentData.profile_photo);
   }, [studentData?.profile_photo]);
 
   if (loading) {

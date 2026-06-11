@@ -16,7 +16,10 @@ export const getImageUrl = (imagePath) => {
   }
   
   // Normalize the API base so uploads always resolve from the API host, not the frontend host.
-  const rawApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
+  const fallbackApiUrl = process.env.NODE_ENV === 'production'
+    ? 'https://apiadmin.thinkschoolapp.org/api'
+    : 'http://localhost:5001/api';
+  const rawApiUrl = process.env.NEXT_PUBLIC_API_URL || fallbackApiUrl;
   let baseUrl = rawApiUrl.trim();
 
   if (baseUrl.startsWith('.')) {

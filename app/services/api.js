@@ -5,7 +5,7 @@ import { getSession } from 'next-auth/react';
 const getBaseURL = () => {
   // Check if we're in production
   if (process.env.NODE_ENV === 'production') {
-    return process.env.NEXT_PUBLIC_API_URL || 'https://api.deepflux.com';
+    return process.env.NEXT_PUBLIC_API_URL || 'https://apiadmin.thinkschoolapp.org/api';
   }
   // Development
   return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';

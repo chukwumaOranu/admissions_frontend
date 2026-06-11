@@ -7,10 +7,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useStudents } from '@/hooks/useRedux';
 import { apiService } from '@/services/api';
+import { getProfilePhotoUrl } from '@/utils/imageUtils';
 import s from '@/styles/student-portal.module.css';
-
-const API_URL   = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-const IMAGE_URL = API_URL.replace('/api', '') || 'http://localhost:5000';
 
 const inp = { width: '100%', padding: '0.5rem 0.75rem', border: '1px solid #d1d5db', borderRadius: 8, fontSize: '0.875rem', color: '#374151', background: '#fff', outline: 'none', boxSizing: 'border-box' };
 
@@ -65,7 +63,7 @@ export default function EditStudentProfile() {
 
   const photoUrl = useMemo(() => {
     if (!student?.profile_photo) return null;
-    return `${IMAGE_URL}${student.profile_photo}?t=${imageRefreshKey}`;
+    return `${getProfilePhotoUrl(student.profile_photo)}?t=${imageRefreshKey}`;
   }, [student?.profile_photo, imageRefreshKey]);
 
   const handleChange = (e) => { setFormData(p => ({ ...p, [e.target.name]: e.target.value })); setError(''); setSuccess(''); };

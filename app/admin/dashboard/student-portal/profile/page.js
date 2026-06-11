@@ -5,10 +5,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { API_ENDPOINTS, apiService } from '@/services/api';
+import { getProfilePhotoUrl } from '@/utils/imageUtils';
 import s from '@/styles/student-portal.module.css';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-const IMAGE_URL = API_URL.replace('/api', '') || 'http://localhost:5000';
 
 const calcAge = (dob) => {
   if (!dob) return null;
@@ -37,7 +35,7 @@ export default function StudentProfile() {
 
   useEffect(() => { if (status === 'authenticated') fetchProfile(); }, [status, fetchProfile]);
 
-  const photoUrl = useMemo(() => student?.profile_photo ? `${IMAGE_URL}${student.profile_photo}` : null, [student?.profile_photo]);
+  const photoUrl = useMemo(() => getProfilePhotoUrl(student?.profile_photo), [student?.profile_photo]);
 
   if (loading) return <div className={s.spinnerWrap}><div className="spinner-border" style={{ color: '#1e3a5f' }} role="status"><span className="visually-hidden">Loading…</span></div></div>;
   if (error)   return <div className={s.wrap}><div className={s.alertDanger}><i className="fas fa-exclamation-triangle me-2" />{error}</div></div>;
