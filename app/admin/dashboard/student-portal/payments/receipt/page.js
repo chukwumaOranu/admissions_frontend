@@ -87,7 +87,7 @@ export default function PaymentReceiptPage() {
             <div style={{ fontSize: '3rem', color: '#d97706', marginBottom: '1rem' }}><i className="fas fa-exclamation-triangle" /></div>
             <h4 style={{ fontWeight: 700, color: '#1e293b', marginBottom: '0.5rem' }}>Receipt Not Found</h4>
             <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>{error || 'Unable to find this payment receipt.'}</p>
-            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center' }}>
+            <div className={s.mobileActions} style={{ justifyContent: 'center' }}>
               <Link href="/admin/dashboard/student-portal/payments/history" className={s.btnPrimary}><i className="fas fa-history" />Payment History</Link>
               <Link href="/admin/dashboard/student-portal/payments" className={s.btnOutline}><i className="fas fa-arrow-left" />Back</Link>
             </div>
@@ -108,7 +108,7 @@ export default function PaymentReceiptPage() {
           </h1>
           <p className={s.pageSub}>Reference: <code style={{ color: '#2563eb', fontSize: '0.85rem' }}>{reference}</code></p>
         </div>
-        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+        <div className={s.mobileActions}>
           <Link href="/admin/dashboard/student-portal/payments/history" className={s.btnOutline}><i className="fas fa-history" />History</Link>
           <button className={s.btnOutline} onClick={handlePreview} disabled={loading}><i className="fas fa-eye" />Preview</button>
           <button className={s.btnGreen} onClick={handleDownload} disabled={downloadingInvoice}>
@@ -127,7 +127,7 @@ export default function PaymentReceiptPage() {
               <p style={{ margin: 0, opacity: 0.75, fontSize: '0.9rem' }}>DeepFlux Academy</p>
             </div>
 
-            <div style={{ padding: '2rem' }}>
+            <div className={s.contentPad}>
               {/* Status */}
               <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
                 <PayBadge status={payment.payment_status} />
@@ -141,9 +141,9 @@ export default function PaymentReceiptPage() {
                       <i className="fas fa-info-circle" style={{ color: '#2563eb' }} />Payment Information
                     </div>
                     {[
-                      ['Amount', <strong style={{ color: '#059669', fontSize: '1.1rem' }}>₦{parseFloat(payment.amount || 0).toLocaleString()}</strong>],
-                      ['Reference', <code style={{ fontSize: '0.75rem', color: '#2563eb' }}>{payment.transaction_reference}</code>],
-                      ['Method', <span className={`${s.badge} ${s.badgeDraft}`}><i className="fas fa-credit-card" />{payment.payment_method || 'Card'}</span>],
+                      ['Amount', <strong key="amount" style={{ color: '#059669', fontSize: '1.1rem' }}>₦{parseFloat(payment.amount || 0).toLocaleString()}</strong>],
+                      ['Reference', <code key="reference" style={{ fontSize: '0.75rem', color: '#2563eb' }}>{payment.transaction_reference}</code>],
+                      ['Method', <span key="method" className={`${s.badge} ${s.badgeDraft}`}><i className="fas fa-credit-card" />{payment.payment_method || 'Card'}</span>],
                       ['Date', fmt(payment.created_at)],
                     ].map(([label, value]) => (
                       <div key={label} className={s.infoRow}>
@@ -163,7 +163,7 @@ export default function PaymentReceiptPage() {
                       ['Name', `${payment.applicant?.first_name || ''} ${payment.applicant?.last_name || ''}`.trim() || '—'],
                       ['Email', payment.applicant?.email || '—'],
                       ['Phone', payment.applicant?.phone || '—'],
-                      ['Application ID', <code style={{ fontSize: '0.75rem', color: '#2563eb' }}>{payment.applicant_id}</code>],
+                      ['Application ID', <code key="application-id" style={{ fontSize: '0.75rem', color: '#2563eb' }}>{payment.applicant_id}</code>],
                     ].map(([label, value]) => (
                       <div key={label} className={s.infoRow}>
                         <span className={s.infoLabel}>{label}</span>
@@ -190,7 +190,7 @@ export default function PaymentReceiptPage() {
                 </div>
               )}
 
-              <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <div className={s.mobileActions} style={{ justifyContent: 'center' }}>
                 <button className={s.btnGreen} onClick={handleDownload} disabled={downloadingInvoice}>
                   {downloadingInvoice ? <><span className="spinner-border spinner-border-sm" />Downloading…</> : <><i className="fas fa-download" />Download PDF</>}
                 </button>
@@ -203,16 +203,16 @@ export default function PaymentReceiptPage() {
 
       {/* Preview modal */}
       {showPreview && previewData && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1050 }}>
-          <div style={{ background: '#fff', borderRadius: '14px', width: '90%', maxWidth: '900px', overflow: 'hidden' }}>
+        <div className={s.modalBackdrop}>
+          <div className={s.modalPanel} style={{ background: '#fff', borderRadius: 8, maxWidth: 900, overflow: 'hidden' }}>
             <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid #e5eaf2', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontWeight: 700 }}><i className="fas fa-file-pdf me-2" style={{ color: '#dc2626' }} />Receipt Preview</span>
               <button className={s.btnOutline} style={{ padding: '0.3rem 0.75rem' }} onClick={() => { setShowPreview(false); setPreviewData(null); }}>
                 <i className="fas fa-times" />Close
               </button>
             </div>
-            <iframe src={previewData.pdf} width="100%" height="600px" style={{ border: 'none', display: 'block' }} title="Receipt Preview" />
-            <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid #e5eaf2', display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+            <iframe src={previewData.pdf} width="100%" height="600px" style={{ border: 'none', display: 'block', maxHeight: '65dvh' }} title="Receipt Preview" />
+            <div className={s.mobileActions} style={{ padding: '1rem 1.5rem', borderTop: '1px solid #e5eaf2', justifyContent: 'flex-end' }}>
               <button className={s.btnOutline} onClick={() => { setShowPreview(false); setPreviewData(null); }}>Close</button>
               <button className={s.btnGreen} onClick={handleDownload} disabled={downloadingInvoice}>
                 {downloadingInvoice ? <><span className="spinner-border spinner-border-sm" />Downloading…</> : <><i className="fas fa-download" />Download PDF</>}

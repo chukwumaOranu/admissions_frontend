@@ -116,7 +116,12 @@ export default function BrowseProgramsPage() {
                           <Link href={`/admin/dashboard/student-portal/applications/${app.id}`} className={`${s.btnOutline} ${s.btnSm}`} style={{ flex: 1, justifyContent: 'center' }}>
                             <i className="fas fa-eye" />View
                           </Link>
-                          {app?.payment_status !== 'paid' && (
+                          {app?.status === 'draft' && (
+                            <Link href={`/admin/dashboard/student-portal/applications/new?schema=${schema.id}`} className={`${s.btnGreen} ${s.btnSm}`} style={{ flex: 1, justifyContent: 'center' }}>
+                              <i className="fas fa-edit" />Continue
+                            </Link>
+                          )}
+                          {app?.payment_status !== 'paid' && ['submitted', 'approved'].includes(app?.status) && (
                             <Link href={`/admin/dashboard/student-portal/payments/pay/${app.id}`} className={`${s.btnGreen} ${s.btnSm}`} style={{ flex: 1, justifyContent: 'center' }}>
                               <i className="fas fa-credit-card" />Pay
                             </Link>

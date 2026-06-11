@@ -9,6 +9,7 @@ import s from '@/styles/student-portal.module.css';
 
 const STATUS_BADGE = {
   pending:  { cls: s.badgePending,  icon: 'fa-clock',        text: 'Pending Review' },
+  submitted:{ cls: s.badgePending,  icon: 'fa-check-circle', text: 'Submitted' },
   approved: { cls: s.badgeApproved, icon: 'fa-check-circle', text: 'Approved' },
   rejected: { cls: s.badgeRejected, icon: 'fa-times-circle', text: 'Rejected' },
   draft:    { cls: s.badgeDraft,    icon: 'fa-edit',         text: 'Draft' },
@@ -175,7 +176,7 @@ export default function StudentApplications() {
                       <Link href={`/admin/dashboard/student-portal/applications/${app.id}`} className={`${s.btnOutline} ${s.btnSm}`}>
                         <i className="fas fa-eye" />View
                       </Link>
-                      {app.payment_status !== 'paid' && (
+                      {app.payment_status !== 'paid' && ['submitted', 'approved'].includes(app.status) && (
                         <Link href={`/admin/dashboard/student-portal/payments/pay/${app.id}`} className={`${s.btnGreen} ${s.btnSm}`}>
                           <i className="fas fa-credit-card" />Pay Now
                         </Link>

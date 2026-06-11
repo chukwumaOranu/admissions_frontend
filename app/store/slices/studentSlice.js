@@ -35,7 +35,7 @@ export const updateStudent = createAsyncThunk(
     }
     
     const response = await apiService.put(API_ENDPOINTS.STUDENTS.UPDATE(id), data);
-    return response.data.data.student;
+    return response.data.data?.student || response.data.data;
   }
 );
 

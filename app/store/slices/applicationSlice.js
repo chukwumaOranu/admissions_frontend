@@ -143,7 +143,22 @@ export const submitApplication = createAsyncThunk(
   'applications/submit',
   async (id) => {
     const response = await apiService.post(API_ENDPOINTS.APPLICATIONS.SUBMIT(id));
-    return response.data.data?.application || response.data.application;
+    return response.data.data?.application || response.data.data || response.data.application;
+  }
+);
+
+// Upload a document selected for a dynamic application field
+export const uploadApplicationDocument = createAsyncThunk(
+  'applications/uploadDocument',
+  async ({ applicationId, formData }) => {
+    const response = await apiService.post(
+      API_ENDPOINTS.APPLICATIONS.UPLOAD_DOCUMENT(applicationId),
+      formData,
+      {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      }
+    );
+    return response.data.data;
   }
 );
 
@@ -376,7 +391,9 @@ const applicationSlice = createSlice({
       
       // Create application
       .addCase(createApplication.fulfilled, (state, action) => {
-        state.applications.push(action.payload);
+        if (action.payload) {
+          state.applications.push(action.payload);
+        }
       })
       
       // Create application schema
@@ -413,6 +430,7 @@ const applicationSlice = createSlice({
       
       // Submit application
       .addCase(submitApplication.fulfilled, (state, action) => {
+        if (!action.payload?.id) return;
         const index = state.applications.findIndex(a => a.id === action.payload.id);
         if (index !== -1) {
           state.applications[index] = action.payload;

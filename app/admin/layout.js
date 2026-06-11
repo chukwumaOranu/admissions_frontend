@@ -53,12 +53,13 @@ export default function AdminLayout({ children }) {
       <div className="d-flex flex-grow-1">
         <SideBar isOpen={sidebarOpen} onClose={closeSidebar} />
         <main 
-          className={`flex-grow-1 p-3 p-md-4 transition-all ${
+          className={`flex-grow-1 transition-all ${
             sidebarOpen && !isMobile ? 'sidebar-open' : 'sidebar-closed'
           }`}
           style={{ 
             marginLeft: isMobile ? '0' : (sidebarOpen ? '280px' : '0'),
-            transition: 'margin-left 0.3s ease-in-out'
+            transition: 'margin-left 0.3s ease-in-out',
+            minWidth: 0
           }}
         >
           <div className="fade-in">

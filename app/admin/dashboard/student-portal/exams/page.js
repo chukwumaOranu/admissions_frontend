@@ -178,35 +178,37 @@ export default function StudentExams() {
               </div>
             </div>
 
-            <div style={{ border: '1px solid #e5eaf2', borderRadius: '10px', overflow: 'hidden' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', background: '#f8fafc', borderBottom: '1px solid #e5eaf2' }}>
-                {WEEKDAYS.map((d) => <div key={d} style={{ textAlign: 'center', padding: '0.5rem 0', fontSize: '0.75rem', fontWeight: 600, color: '#6b7280' }}>{d}</div>)}
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: '2px', padding: '4px', background: '#f8fafc' }}>
-                {grid.map((cell) => cell.empty ? (
-                  <div key={cell.key} style={{ height: 72 }} />
-                ) : (
-                  <button key={cell.key} type="button" disabled={!cell.hasSlots}
-                    onClick={() => {
-                      setSelectedDate(cell.dateKey);
-                      const slots = grouped[cell.dateKey] || [];
-                      if (!slots.some((sl) => String(sl.id) === selectedSlotId)) setSelectedSlotId(slots.length ? String(slots[0].id) : '');
-                    }}
-                    style={{
-                      height: 72, borderRadius: '8px', border: 'none', cursor: cell.hasSlots ? 'pointer' : 'default',
-                      background: selectedDate === cell.dateKey ? '#1e3a5f' : cell.hasSlots ? '#eff6ff' : '#fff',
-                      color: selectedDate === cell.dateKey ? '#fff' : cell.hasSlots ? '#1e3a5f' : '#d1d5db',
-                      padding: '0.4rem', textAlign: 'left', transition: 'all 0.15s',
-                    }}
-                  >
-                    <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>{cell.day}</div>
-                    {cell.hasSlots && (
-                      <div style={{ fontSize: '0.65rem', lineHeight: 1.3, opacity: 0.85 }}>
-                        {cell.slotCount} slot{cell.slotCount !== 1 ? 's' : ''}<br />{cell.remaining} left
-                      </div>
-                    )}
-                  </button>
-                ))}
+            <div className={s.calendarViewport}>
+              <div className={s.calendarGrid}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', background: '#f8fafc', borderBottom: '1px solid #e5eaf2' }}>
+                  {WEEKDAYS.map((d) => <div key={d} style={{ textAlign: 'center', padding: '0.5rem 0', fontSize: '0.75rem', fontWeight: 600, color: '#6b7280' }}>{d}</div>)}
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: '2px', padding: '4px', background: '#f8fafc' }}>
+                  {grid.map((cell) => cell.empty ? (
+                    <div key={cell.key} style={{ height: 72 }} />
+                  ) : (
+                    <button key={cell.key} type="button" disabled={!cell.hasSlots}
+                      onClick={() => {
+                        setSelectedDate(cell.dateKey);
+                        const slots = grouped[cell.dateKey] || [];
+                        if (!slots.some((sl) => String(sl.id) === selectedSlotId)) setSelectedSlotId(slots.length ? String(slots[0].id) : '');
+                      }}
+                      style={{
+                        height: 72, borderRadius: '8px', border: 'none', cursor: cell.hasSlots ? 'pointer' : 'default',
+                        background: selectedDate === cell.dateKey ? '#1e3a5f' : cell.hasSlots ? '#eff6ff' : '#fff',
+                        color: selectedDate === cell.dateKey ? '#fff' : cell.hasSlots ? '#1e3a5f' : '#d1d5db',
+                        padding: '0.4rem', textAlign: 'left', transition: 'all 0.15s',
+                      }}
+                    >
+                      <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>{cell.day}</div>
+                      {cell.hasSlots && (
+                        <div style={{ fontSize: '0.65rem', lineHeight: 1.3, opacity: 0.85 }}>
+                          {cell.slotCount} slot{cell.slotCount !== 1 ? 's' : ''}<br />{cell.remaining} left
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 

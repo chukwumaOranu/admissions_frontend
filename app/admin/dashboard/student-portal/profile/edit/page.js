@@ -88,7 +88,11 @@ export default function EditStudentProfile() {
       const newUrl = res.data?.data?.profile_photo || res.data?.profile_photo;
       if (newUrl) { setStudent(p => ({ ...p, profile_photo: newUrl })); setImageRefreshKey(Date.now()); }
       setPhotoFile(null); setPhotoPreview(null);
-      setTimeout(fetchProfile, 1000);
+      if (redirectUrl) {
+        setTimeout(() => router.push(redirectUrl), 800);
+      } else {
+        setTimeout(fetchProfile, 1000);
+      }
     } catch (err) { setError(err.response?.data?.message || 'Failed to upload photo'); }
     finally { setUploading(false); }
   };
@@ -110,7 +114,7 @@ export default function EditStudentProfile() {
     if (!formData.first_name || !formData.last_name || !formData.email) { setError('First name, last name, and email are required'); return; }
     try {
       setSaving(true); setError('');
-      updateStudent({ id: student.id, data: formData });
+      await updateStudent({ id: student.id, data: formData }).unwrap();
       setSuccess('Profile updated successfully!');
       setTimeout(() => router.push(redirectUrl || '/admin/dashboard/student-portal/profile'), 2000);
     } catch (err) { setError(err.response?.data?.message || 'Failed to update profile'); }
@@ -160,7 +164,7 @@ export default function EditStudentProfile() {
       )}
 
       <form onSubmit={handleSubmit}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>
+        <div className={s.responsiveGrid}>
 
           {/* Main form */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -171,7 +175,7 @@ export default function EditStudentProfile() {
                 <input type="text" value={student.student_id || ''} disabled style={{ ...inp, background: '#f3f4f6', color: '#9ca3af', cursor: 'not-allowed' }} />
                 <p style={{ fontSize: '0.72rem', color: '#9ca3af', margin: '0.2rem 0 0' }}>Student ID cannot be changed</p>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+              <div className={s.formGrid3} style={{ marginBottom: '1rem' }}>
                 <div>
                   {lbl('First Name', true)}
                   <input type="text" name="first_name" value={formData.first_name} onChange={handleChange} required style={inp} />
@@ -185,7 +189,7 @@ export default function EditStudentProfile() {
                   <input type="text" name="middle_name" value={formData.middle_name} onChange={handleChange} style={inp} />
                 </div>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div className={s.formGrid2}>
                 <div>
                   {lbl('Gender')}
                   <select name="gender" value={formData.gender} onChange={handleChange} style={inp}>
@@ -203,7 +207,7 @@ export default function EditStudentProfile() {
             </Section>
 
             <Section icon="fas fa-address-book" color="#0891b2" bg="#e0f2fe" title="Contact Information">
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+              <div className={s.formGrid2} style={{ marginBottom: '1rem' }}>
                 <div>
                   {lbl('Email', true)}
                   <input type="email" name="email" value={formData.email} onChange={handleChange} required style={inp} />
@@ -217,7 +221,7 @@ export default function EditStudentProfile() {
                 {lbl('Address')}
                 <textarea name="address" value={formData.address} onChange={handleChange} rows={2} placeholder="Street address" style={{ ...inp, resize: 'vertical' }} />
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+              <div className={s.formGrid3}>
                 <div>{lbl('City')}<input type="text" name="city"    value={formData.city}    onChange={handleChange} style={inp} /></div>
                 <div>{lbl('State')}<input type="text" name="state"   value={formData.state}   onChange={handleChange} style={inp} /></div>
                 <div>{lbl('Country')}<input type="text" name="country" value={formData.country} onChange={handleChange} placeholder="Nigeria" style={inp} /></div>
@@ -225,7 +229,7 @@ export default function EditStudentProfile() {
             </Section>
 
             <Section icon="fas fa-user-friends" color="#d97706" bg="#fef3c7" title="Guardian / Parent Information">
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+              <div className={s.formGrid2} style={{ marginBottom: '1rem' }}>
                 <div>
                   {lbl('Guardian Name')}
                   <input type="text" name="guardian_name" value={formData.guardian_name} onChange={handleChange} placeholder="Full name" style={inp} />
@@ -313,13 +317,13 @@ export default function EditStudentProfile() {
 
       {/* Confirm Delete Photo */}
       {confirmDeletePhoto && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
-          <div style={{ background: '#fff', borderRadius: 12, width: '100%', maxWidth: 380, padding: '1.5rem', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
+        <div className={s.modalBackdrop}>
+          <div className={s.modalPanel} style={{ background: '#fff', borderRadius: 8, maxWidth: 380, padding: '1.5rem', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
             <h2 style={{ fontSize: '1rem', fontWeight: 600, color: '#1e3a5f', marginBottom: '0.75rem' }}>
               <i className="fas fa-trash" style={{ color: '#dc2626', marginRight: 8 }} />Delete Profile Photo
             </h2>
             <p style={{ fontSize: '0.875rem', color: '#374151', marginBottom: '1.25rem' }}>Are you sure you want to delete your profile photo? This cannot be undone.</p>
-            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+            <div className={s.mobileActions} style={{ justifyContent: 'flex-end' }}>
               <button onClick={() => setConfirmDeletePhoto(false)} className={s.btnOutline} disabled={uploading}><i className="fas fa-times" />Cancel</button>
               <button onClick={handleDeletePhoto} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 1rem', background: '#dc2626', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 600, cursor: 'pointer', fontSize: '0.875rem' }} disabled={uploading}>
                 {uploading ? <><span className="spinner-border spinner-border-sm" />Deleting…</> : <><i className="fas fa-trash" />Delete</>}

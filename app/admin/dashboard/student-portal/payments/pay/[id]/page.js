@@ -217,7 +217,7 @@ export default function PayApplicationFeePage() {
               <p style={{ margin: 0, opacity: 0.75, fontSize: '0.875rem' }}>Secure payment powered by Paystack</p>
             </div>
 
-            <div style={{ padding: '2rem' }}>
+            <div className={s.contentPad}>
               {/* Application details */}
               <div style={{ marginBottom: '1.5rem' }}>
                 <div style={{ fontWeight: 600, color: '#1e293b', marginBottom: '0.75rem' }}>Application Details</div>

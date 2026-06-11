@@ -10,6 +10,7 @@ import s from '@/styles/student-portal.module.css';
 
 const STATUS_CFG = {
   pending:  { cls: s.badgePending,  icon: 'fa-clock',        text: 'Pending Review' },
+  submitted:{ cls: s.badgePending,  icon: 'fa-check-circle', text: 'Submitted' },
   approved: { cls: s.badgeApproved, icon: 'fa-check-circle', text: 'Approved' },
   rejected: { cls: s.badgeRejected, icon: 'fa-times-circle', text: 'Rejected' },
   draft:    { cls: s.badgeDraft,    icon: 'fa-edit',         text: 'Draft' },
@@ -92,7 +93,7 @@ export default function ViewApplication() {
           <div className={s.emptyState}>
             <div className={s.emptyIcon}><i className="fas fa-exclamation-triangle" style={{ color: '#d97706' }} /></div>
             <h5 className={s.emptyTitle}>Application Not Found</h5>
-            <p className={s.emptySub}>This application doesn't exist or you don't have permission to view it.</p>
+            <p className={s.emptySub}>This application does not exist or you do not have permission to view it.</p>
             <Link href="/admin/dashboard/student-portal/applications" className={s.btnPrimary}><i className="fas fa-arrow-left" />Back to Applications</Link>
           </div>
         </div>
@@ -154,7 +155,7 @@ export default function ViewApplication() {
                   ['Applicant', `${application.first_name || ''} ${application.last_name || ''}`.trim()],
                   ['Email', application.email],
                   ['Phone', application.phone || '—'],
-                  ['Application Fee', <span style={{ color: '#059669', fontWeight: 700 }}>₦{parseFloat(application.application_fee || 0).toLocaleString()}</span>],
+                  ['Application Fee', <span key="application-fee" style={{ color: '#059669', fontWeight: 700 }}>₦{parseFloat(application.application_fee || 0).toLocaleString()}</span>],
                   ['Submitted', fmt(application.created_at)],
                   ['Last Updated', fmt(application.updated_at)],
                   ...(application.exam_date ? [['Exam Date', fmt(application.exam_date)]] : []),
@@ -181,7 +182,7 @@ export default function ViewApplication() {
           <div className={s.card} style={{ marginBottom: '1.25rem' }}>
             <div className={s.cardHeader}><span className={s.cardTitle}><i className="fas fa-bolt me-2" style={{ color: '#d97706' }} />Actions</span></div>
             <div className={s.cardBody} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              {application.payment_status !== 'paid' && (
+              {application.payment_status !== 'paid' && ['submitted', 'approved'].includes(application.status) && (
                 <Link href={`/admin/dashboard/student-portal/payments/pay/${application.id}`} className={s.btnGreen} style={{ justifyContent: 'center' }}>
                   <i className="fas fa-credit-card" />Make Payment
                 </Link>

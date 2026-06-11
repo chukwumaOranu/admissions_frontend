@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import layoutStyles from './dashboard-layout.module.css';
 
 const TABS = [
   { id: 'overview',      label: 'Overview',      icon: 'fas fa-chart-pie',       href: '/admin/dashboard' },
@@ -30,11 +31,11 @@ export default function DashboardLayout({ children }) {
   };
 
   return (
-    <div style={{ minHeight: '100vh' }}>
+    <div className={layoutStyles.shell}>
 
       {/* Page Header */}
-      <div style={{ background: '#fff', borderBottom: '1px solid #e5eaf2', padding: '1.25rem 1.5rem 0', marginBottom: 0 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.25rem' }}>
+      <div className={layoutStyles.header}>
+        <div className={layoutStyles.headerRow}>
           <div>
             <h1 style={{ margin: 0, fontSize: '1.35rem', fontWeight: 800, color: '#1e293b', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
               <span style={{ width: 34, height: 34, borderRadius: '9px', background: '#eff6ff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -76,22 +77,14 @@ export default function DashboardLayout({ children }) {
         </div>
 
         {/* Tab Bar */}
-        <div style={{ display: 'flex', gap: 0, overflowX: 'auto', scrollbarWidth: 'none' }}>
+        <div className={layoutStyles.tabs}>
           {tabs.map((tab) => {
             const active = isTabActive(tab);
             return (
               <Link
                 key={tab.id}
                 href={tab.href}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '0.45rem',
-                  padding: '0.65rem 1.1rem', fontSize: '0.85rem', fontWeight: active ? 600 : 500,
-                  color: active ? '#2563eb' : '#64748b', textDecoration: 'none',
-                  borderBottom: active ? '2px solid #2563eb' : '2px solid transparent',
-                  whiteSpace: 'nowrap', transition: 'color 0.15s', flexShrink: 0,
-                }}
-                onMouseEnter={(e) => { if (!active) e.currentTarget.style.color = '#1e293b'; }}
-                onMouseLeave={(e) => { if (!active) e.currentTarget.style.color = '#64748b'; }}
+                className={`${layoutStyles.tab} ${active ? layoutStyles.tabActive : ''}`}
               >
                 <i className={tab.icon} style={{ fontSize: '0.8rem' }} />
                 {tab.label}
@@ -102,7 +95,7 @@ export default function DashboardLayout({ children }) {
       </div>
 
       {/* Content */}
-      <div style={{ padding: '1.5rem' }}>
+      <div className={layoutStyles.content}>
         {children}
       </div>
     </div>

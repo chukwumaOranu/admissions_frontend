@@ -97,7 +97,7 @@ export default function VerifyPaymentPage() {
               <h3 style={{ fontWeight: 700, margin: '0 0 0.4rem' }}>Payment Successful!</h3>
               <p style={{ margin: 0, opacity: 0.85 }}>Your application fee has been received</p>
             </div>
-            <div style={{ padding: '2rem' }}>
+            <div className={s.contentPad}>
               {/* Details grid */}
               <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '10px', padding: '1.25rem', marginBottom: '1.5rem' }}>
                 <div style={{ fontWeight: 600, color: '#065f46', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
@@ -105,10 +105,10 @@ export default function VerifyPaymentPage() {
                 </div>
                 <div className="row g-2">
                   {[
-                    ['Amount Paid', <strong style={{ fontSize: '1.1rem' }}>₦{amountPaid.toLocaleString()}</strong>],
-                    ['Reference', <code style={{ fontSize: '0.8rem', color: '#2563eb' }}>{txRef}</code>],
+                    ['Amount Paid', <strong key="amount-paid" style={{ fontSize: '1.1rem' }}>₦{amountPaid.toLocaleString()}</strong>],
+                    ['Reference', <code key="reference" style={{ fontSize: '0.8rem', color: '#2563eb' }}>{txRef}</code>],
                     ['Payment Date', paidAt ? new Date(paidAt).toLocaleString() : new Date().toLocaleString()],
-                    ['Status', <span className={`${s.badge} ${s.badgeApproved}`}><i className="fas fa-check-circle" />Confirmed</span>],
+                    ['Status', <span key="status" className={`${s.badge} ${s.badgeApproved}`}><i className="fas fa-check-circle" />Confirmed</span>],
                   ].map(([label, value]) => (
                     <div key={label} className="col-6">
                       <div style={{ fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: '0.2rem' }}>{label}</div>
@@ -120,10 +120,10 @@ export default function VerifyPaymentPage() {
 
               {/* Next steps */}
               <div className={`${s.alertInfo} mb-4`}>
-                <div style={{ fontWeight: 600, marginBottom: '0.5rem' }}><i className="fas fa-arrow-right me-2" />What's Next?</div>
+                <div style={{ fontWeight: 600, marginBottom: '0.5rem' }}><i className="fas fa-arrow-right me-2" />What&apos;s Next?</div>
                 <ul style={{ margin: 0, paddingLeft: '1.25rem', fontSize: '0.875rem' }}>
                   <li>Your application is now under review</li>
-                  <li>You'll receive an email once it's reviewed</li>
+                  <li>You&apos;ll receive an email once it&apos;s reviewed</li>
                   <li>An exam date will be assigned if approved</li>
                 </ul>
               </div>

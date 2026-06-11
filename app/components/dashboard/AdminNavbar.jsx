@@ -71,6 +71,7 @@ export default function AdminNavbar({ onToggleSidebar }) {
     { id: 3, title: 'New User Registered',        message: 'A new user account has been created',           time: '2 hrs ago', unread: false, icon: 'fas fa-user',     color: '#059669' },
   ];
   const unreadCount = notifications.filter(n => n.unread).length;
+  const isStudent = session?.user?.role === 'Student';
 
   const handleLogout = useCallback(async () => {
     try { await signOut({ callbackUrl: '/login' }); }
@@ -146,7 +147,7 @@ export default function AdminNavbar({ onToggleSidebar }) {
           {showNotifications && (
             <div style={{
               position: 'absolute', top: 'calc(100% + 8px)', right: 0,
-              width: isMobile ? 288 : 340, background: '#fff', borderRadius: '12px',
+              width: isMobile ? 'min(288px, calc(100vw - 1rem))' : 340, background: '#fff', borderRadius: '8px',
               boxShadow: '0 8px 32px rgba(0,0,0,0.12)', border: '1px solid #e5eaf2', zIndex: 1000, overflow: 'hidden',
             }}>
               <div style={{ padding: '0.875rem 1rem', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -215,7 +216,7 @@ export default function AdminNavbar({ onToggleSidebar }) {
           {showUserMenu && (
             <div style={{
               position: 'absolute', top: 'calc(100% + 8px)', right: 0,
-              width: isMobile ? 260 : 240, background: '#fff', borderRadius: '12px',
+              width: isMobile ? 'min(280px, calc(100vw - 1rem))' : 240, background: '#fff', borderRadius: '8px',
               boxShadow: '0 8px 32px rgba(0,0,0,0.12)', border: '1px solid #e5eaf2', zIndex: 1000, overflow: 'hidden',
             }}>
               {/* Header */}
@@ -237,10 +238,13 @@ export default function AdminNavbar({ onToggleSidebar }) {
               </div>
 
               {/* Menu items */}
-              {[
+              {(isStudent ? [
+                { icon: 'fas fa-user', label: 'My Profile', href: '/admin/dashboard/student-portal/profile' },
+                { icon: 'fas fa-question-circle', label: 'Help & Support', href: '/admin/dashboard/student-portal/help' },
+              ] : [
                 { icon: 'fas fa-user', label: 'My Profile', href: session?.user?.id ? `/admin/dashboard/users/${session.user.id}` : '/admin/dashboard/users' },
                 { icon: 'fas fa-cog',  label: 'Settings',   href: '/admin/dashboard/settings/school' },
-              ].map((item) => (
+              ]).map((item) => (
                 <Link key={item.label} href={item.href}
                   style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.65rem 1rem', textDecoration: 'none', color: '#374151', fontSize: '0.875rem', fontWeight: 500, transition: 'background 0.15s' }}
                   onMouseEnter={(e) => { e.currentTarget.style.background = '#f8fafc'; }}

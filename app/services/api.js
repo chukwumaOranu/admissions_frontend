@@ -268,6 +268,7 @@ export const API_ENDPOINTS = {
     UPDATE_PAYMENT_STATUS: (id) => `/applications/${id}/payment-status`,
     STATS: '/applications/stats',
     UPLOAD_PASSPORT: (id) => `/applications/${id}/passport-photo`,
+    UPLOAD_DOCUMENT: (id) => `/applications/${id}/documents`,
     REQUEST_INFO: (id) => `/applications/${id}/request-info`,
     SEND_ACCEPTANCE_LETTER: (id) => `/applications/${id}/send-acceptance-letter`,
     SEND_REJECTION_LETTER: (id) => `/applications/${id}/send-rejection-letter`,

@@ -259,7 +259,8 @@ export const useApplications = () => {
     updateApplicationStatus: (id, status, notes) => dispatch(applicationActions.updateApplicationStatus({ id, status, notes })),
     updateApplicationPaymentStatus: (id, status) => dispatch(applicationActions.updateApplicationPaymentStatus({ id, status })),
     fetchApplicationStats,
-    uploadApplicationPassportPhoto: (id, formData) => dispatch(applicationActions.uploadApplicationPassportPhoto({ id, formData })),
+    uploadApplicationPassportPhoto: (id, formData) => dispatch(applicationActions.uploadApplicationPassportPhoto({ applicationId: id, formData })),
+    uploadApplicationDocument: (id, formData) => dispatch(applicationActions.uploadApplicationDocument({ applicationId: id, formData })),
     sendAcceptanceLetter: (id) => dispatch(applicationActions.sendAcceptanceLetter(id)),
     generateAdmissionLetter: (id) => dispatch(applicationActions.generateAdmissionLetter(id)),
     clearError: () => dispatch(applicationActions.clearError())

@@ -44,6 +44,7 @@ export default function PublicStudentRegistrationPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [loginCredentials, setLoginCredentials] = useState(null);
 
   useEffect(() => {
     const fetchSchemas = async () => {
@@ -101,6 +102,7 @@ export default function PublicStudentRegistrationPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
     setError('');
     setSuccessMessage('');
+    setLoginCredentials(null);
   };
 
   const handleCustomFieldChange = (event, field) => {
@@ -139,8 +141,9 @@ export default function PublicStudentRegistrationPage() {
       }
 
       setSuccessMessage(
-        `Registration submitted successfully. Reference: ${payload.data?.student_id || 'N/A'}. The admin will contact you after review.`
+        `Registration submitted successfully. Reference: ${payload.data?.student_id || 'N/A'}.`
       );
+      setLoginCredentials(payload.data?.login_credentials || null);
       setFormData(defaultFormState);
       setCustomData({});
     } catch (submitError) {
@@ -158,7 +161,7 @@ export default function PublicStudentRegistrationPage() {
             <span className={styles.showcaseBadge}>Public Admissions</span>
             <h1 className={styles.showcaseTitle}>Student Registration</h1>
             <p className={styles.showcaseText}>
-              Submit the applicant details once. The admissions office will review the record and share the next steps.
+              Register once, then sign in to complete your admission application and payment.
             </p>
             <div className={styles.summaryCard}>
               <div>
@@ -189,7 +192,7 @@ export default function PublicStudentRegistrationPage() {
                 <i className="fas fa-key"></i>
                 <div>
                   <strong>Receive Portal Access</strong>
-                  <span>You will be contacted when portal access is ready.</span>
+                  <span>Your login details are shown after registration and sent by email.</span>
                 </div>
               </div>
             </div>
@@ -230,7 +233,15 @@ export default function PublicStudentRegistrationPage() {
             {!loadingSchemas && successMessage && (
               <div className="alert alert-success mb-4">
                 <p className="mb-2">{successMessage}</p>
-                <p className="mb-0">Please wait for the school admin to send the next admission instructions.</p>
+                {loginCredentials ? (
+                  <>
+                    <p className="mb-1"><strong>Username:</strong> {loginCredentials.username}</p>
+                    <p className="mb-2"><strong>Temporary password:</strong> {loginCredentials.password}</p>
+                    <a href="/login" className="btn btn-success">Sign in to complete your application</a>
+                  </>
+                ) : (
+                  <p className="mb-0">Check your email for student portal login details.</p>
+                )}
               </div>
             )}
 

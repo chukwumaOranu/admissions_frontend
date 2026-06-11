@@ -1,0 +1,82 @@
+.shell {
+  min-height: 100vh;
+}
+
+.header {
+  background: #fff;
+  border-bottom: 1px solid #e5eaf2;
+  padding: 1.25rem 1.5rem 0;
+}
+
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.tabs {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  overscroll-behavior-inline: contain;
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.65rem 1.1rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #64748b;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tabActive {
+  color: #2563eb;
+  border-bottom-color: #2563eb;
+  font-weight: 600;
+}
+
+.content {
+  padding: 1.5rem;
+  min-width: 0;
+}
+
+@media (max-width: 767px) {
+  .header {
+    padding: 0.85rem 0 0;
+    position: sticky;
+    top: 64px;
+    z-index: 1010;
+  }
+
+  .headerRow {
+    display: none;
+  }
+
+  .tabs {
+    padding: 0 0.35rem;
+  }
+
+  .tab {
+    min-height: 46px;
+    padding: 0.65rem 0.8rem;
+    font-size: 0.78rem;
+  }
+
+  .content {
+    padding: 0;
+  }
+}
